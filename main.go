@@ -3,14 +3,16 @@ package main
 import (
 	"flag"
 	"log"
+	"read-adviser-bot/clients/telegram"
+)
+
+const (
+	tgBotHost = "api.telegram.org"
 )
 
 func main() {
-	// токен получаем из параметров при запуске программы (чтобы не светить в коде)
-	token := mustToken()
-
 	// tgClient - через него идет общение с телегой
-	// tgClient = tgClient.New(token)
+	tgClient := telegram.New(tgBotHost, mustToken())
 
 	// fetcher - получает; processor - обрабатывает
 	// fetcher отправляет в телегу сообщения, чтобы получать новые события
