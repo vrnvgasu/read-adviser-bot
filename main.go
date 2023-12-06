@@ -3,25 +3,29 @@ package main
 import (
 	"flag"
 	"log"
-	"read-adviser-bot/clients/telegram"
+	client "read-adviser-bot/clients/telegram"
+	event_consumer "read-adviser-bot/consumer/event-consumer"
+	"read-adviser-bot/events/telegram"
+	"read-adviser-bot/storage/files"
 )
 
 const (
-	tgBotHost = "api.telegram.org"
+	tgBotHost   = "api.telegram.org"
+	storagePath = "storage"
+	batchSize   = 100
 )
 
 func main() {
 	// tgClient - через него идет общение с телегой
-	tgClient := telegram.New(tgBotHost, mustToken())
+	tgClient := client.New(tgBotHost, mustToken())
+	eventsProcessor := telegram.New(tgClient, files.New(storagePath))
 
-	// fetcher - получает; processor - обрабатывает
-	// fetcher отправляет в телегу сообщения, чтобы получать новые события
-	// fetcher = fetcher.New()
-	// processor отправляет в телегу новые сообщения после обработки
-	// processor = processor.New()
+	log.Print("service started")
 
-	// consumer получает и обрабатывает сообщения.
-	// consumer.Start(fetcher, processor)
+	consumer := event_consumer.New(eventsProcessor, eventsProcessor, batchSize)
+	if err := consumer.Start(); err != nil {
+		log.Fatal("service is stopped", err)
+	}
 }
 
 // must - указание на то, что с этой функцией надо быть осторожным
