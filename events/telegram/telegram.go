@@ -31,7 +31,7 @@ func New(client *telegram.Client, storage storage.Storage) *Processor {
 	}
 }
 
-func (p Processor) Fetch(limit int) ([]events.Event, error) {
+func (p *Processor) Fetch(limit int) ([]events.Event, error) {
 	updates, err := p.tg.Updates(p.offset, limit)
 	if err != nil {
 		return nil, e.Wrap("can't get events", err)
@@ -42,18 +42,18 @@ func (p Processor) Fetch(limit int) ([]events.Event, error) {
 	}
 
 	// превращаем все updates из телеге в events
-	events := make([]events.Event, 0, len(updates))
+	gotEvents := make([]events.Event, 0, len(updates))
 	for _, u := range updates {
-		events = append(events, event(u))
+		gotEvents = append(gotEvents, event(u))
 	}
 
 	// обновляет offset, чтобы при следующем запросе получить только новые сообщения из телеги
 	p.offset = updates[len(updates)-1].ID + 1
 
-	return events, nil
+	return gotEvents, nil
 }
 
-func (p Processor) Process(event events.Event) error {
+func (p *Processor) Process(event events.Event) error {
 	switch event.Type {
 	case events.Message:
 		return p.processMessage(event)
@@ -62,7 +62,7 @@ func (p Processor) Process(event events.Event) error {
 	}
 }
 
-func (p Processor) processMessage(event events.Event) error {
+func (p *Processor) processMessage(event events.Event) error {
 	meta, err := meta(event)
 	if err != nil {
 		return e.Wrap("can't process message", err)

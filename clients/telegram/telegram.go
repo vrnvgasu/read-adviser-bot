@@ -65,7 +65,7 @@ func (c *Client) Updates(offset int, limit int) ([]Update, error) {
 func (c *Client) SendMessage(chatID int, text string) error {
 	// формируем запрос
 	query := url.Values{}
-	query.Add("chatID", strconv.Itoa(chatID))
+	query.Add("chat_id", strconv.Itoa(chatID))
 	query.Add("text", text)
 
 	// отправляем запрос на "sendMessage"

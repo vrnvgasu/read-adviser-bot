@@ -87,7 +87,7 @@ func (s Storage) Remove(page *storage.Page) error {
 		return e.Wrap("can't remove file", err)
 	}
 
-	path := filepath.Join(s.basePath, fileName)
+	path := filepath.Join(s.basePath, page.UserName, fileName)
 
 	if err := os.Remove(path); err != nil {
 		msg := fmt.Sprintf("can't remove file %s", path)
@@ -110,7 +110,7 @@ func (s Storage) IsExists(page *storage.Page) (bool, error) {
 	// проверяет существование (возвращает несколько вариантов ошибок)
 	switch _, err = os.Stat(path); {
 	case errors.Is(err, os.ErrNotExist):
-		return false, err
+		return false, nil
 	case err != nil:
 		msg := fmt.Sprintf("can't find file %s", path)
 

@@ -2,7 +2,7 @@ package telegram
 
 // https://core.telegram.org/bots/api#making-requests
 type UpdatesResponse struct {
-	Ok     string   `json:"ok"`
+	Ok     bool     `json:"ok"`
 	Result []Update `json:"result"`
 }
 
