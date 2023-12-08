@@ -1,18 +1,20 @@
 package storage
 
 import (
+	"context"
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"io"
 	"read-adviser-bot/lib/e"
 )
 
 type Storage interface {
-	Save(p *Page) error
-	PickRandom(userName string) (*Page, error) // кому показать
-	Remove(p *Page) error
-	IsExists(p *Page) (bool, error) // существует ли страница
+	Save(ctx context.Context, p *Page) error
+	PickRandom(ctx context.Context, userName string) (*Page, error) // кому показать
+	Remove(ctx context.Context, p *Page) error
+	IsExists(ctx context.Context, p *Page) (bool, error) // существует ли страница
 }
 
 // страница, на которую ведет ссылка, которую скинули боту

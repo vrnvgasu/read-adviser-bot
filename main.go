@@ -1,24 +1,36 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	client "read-adviser-bot/clients/telegram"
 	event_consumer "read-adviser-bot/consumer/event-consumer"
 	"read-adviser-bot/events/telegram"
-	"read-adviser-bot/storage/files"
+	"read-adviser-bot/storage/sqlite"
 )
 
 const (
-	tgBotHost   = "api.telegram.org"
-	storagePath = "files_storage"
-	batchSize   = 100
+	tgBotHost         = "api.telegram.org"
+	sqliteStoragePath = "data/sqlite/storage.db"
+	batchSize         = 100
 )
 
 func main() {
+	//storage := files.New(storagePath) // хранение в файлах
+	storage, err := sqlite.New(sqliteStoragePath) // хранение в БД
+	if err != nil {
+		log.Fatal("can't connect to storage", err)
+	}
+
+	// `TODO` - указываем, что еще не определились, какой конкретно контекст будем использовать
+	if err := storage.Init(context.TODO()); err != nil {
+		log.Fatal("can't init storage", err)
+	}
+
 	// tgClient - через него идет общение с телегой
 	tgClient := client.New(tgBotHost, mustToken())
-	eventsProcessor := telegram.New(tgClient, files.New(storagePath))
+	eventsProcessor := telegram.New(tgClient, storage)
 
 	log.Print("service started")
 
